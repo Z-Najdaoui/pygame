@@ -130,13 +130,30 @@ def game_over():
             if event.type == pygame.QUIT:
                 run1 = False
 
+# for loop
+over_font = pygame.font.Font('./fonts/ARCADECLASSIC.TTF', 64)
+already_played = False
+WINNER = ""
+show_game_info = True
+controles = pygame.image.load('./images/Controles_menu.png')
 
 # game loop D
-already_played = False
-over_font = pygame.font.Font('./fonts/ARCADECLASSIC.TTF', 64)
-WINNER = ""
 run = True
 while run:
+    if show_game_info:
+        screen.fill((80, 80, 80))
+        screen.blit(controles, (0, 0))
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            # set show_game_info = false when click on space
+            # that will start game
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    show_game_info = False
+        continue
+
 
     player_score = Bullet.score()[0]
     enemy_score = Bullet.score()[1]
@@ -250,3 +267,4 @@ while run:
     enemy(enemyX, enemyY)
 
     pygame.display.update()
+    
