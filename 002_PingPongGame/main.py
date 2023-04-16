@@ -68,8 +68,8 @@ while run:
     # for start movement of ball
     if not ball_feat['move']:
         if keys[pygame.K_SPACE]:
-            Tab_dir = [-2, 2]
-            ball_feat['dir_s'] = Tab_dir[random.randint(0, 1)]
+            ball_feat['dir_s'] = random.choice([-2, 2])
+            ball_feat['ang'] = random.choice([-1, 1])
             ball_feat['move'] = True
     # for bars
     if keys[pygame.K_LEFT]:
