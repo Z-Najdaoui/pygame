@@ -78,7 +78,7 @@ P_SIZE = 60
 playerImg = pygame.transform.scale(img_player, (60, 60))
 playerX = 370
 playerY = 500
-playerCh = 2
+playerCh = 5 #speed
 X_L = X_R = Y_U = Y_D = 0
 player_score = 0
 
@@ -100,7 +100,7 @@ E_SIZE = 60
 enemyImg = pygame.transform.scale(img_enemy, (E_SIZE, E_SIZE))
 enemyX = 370
 enemyY = 60
-enemyCh = 2
+enemyCh = 5 # speed
 EX_L = EX_R = EY_U = EY_D = 0
 enemy_score = 0
 
@@ -136,7 +136,8 @@ already_played = False
 WINNER = ""
 show_game_info = True
 controles = pygame.image.load('./images/Controles_menu.png')
-
+# create a clock object to control the frame rate
+clock = pygame.time.Clock()
 # game loop D
 run = True
 while run:
@@ -267,4 +268,5 @@ while run:
     enemy(enemyX, enemyY)
 
     pygame.display.update()
+    clock.tick(60)
     

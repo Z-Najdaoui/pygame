@@ -2,6 +2,13 @@ import pygame
 import random
 from pygame import mixer  # for sounds
 
+# games controles
+ROUNDS = 5  # game rounds
+bar = {"w": 80, "h": 5, 'wallSp': 5, 'speed': 6, 'color': (210, 210, 210), 'multiAng': 9}  # bar object or dict have default value of bars
+main_features = {'color': (50, 50, 50), 'position': (50, 50)}   # game place features
+ball_feat = {'w': 8, 'h': 8, 'dir_s': 0, 'ang': 0, 'addAng': 0.05, 'addSpeed': 1.08, 'move': False}  # ball features
+
+
 # windows size
 WINDOW_SIZE = (900, 650)
 # initialize all imported pygame modules
@@ -10,6 +17,7 @@ pygame.init()
 window = pygame.display.set_mode(WINDOW_SIZE)
 window.fill((20, 20, 20))
 
+
 # background music
 pygame.mixer.music.load("./sounds/bg.mp3")
 # Set the volume of the background music
@@ -17,7 +25,6 @@ pygame.mixer.music.set_volume(0.1)
 # Start playing the background music
 pygame.mixer.music.play(-1)  # -1: playing bg music on a loop
 # create canvas main for make play on it
-main_features = {'color': (50, 50, 50), 'position': (50, 50)}
 main_SIZE = (WINDOW_SIZE[0] - 100, WINDOW_SIZE[1] - 100)
 main = pygame.Surface(main_SIZE)
 main.fill(main_features['color'])
@@ -29,8 +36,6 @@ def random_color() -> tuple:
 
 
 # players bars
-# bar object or dict have default value of bars
-bar = {"w": 80, "h": 5, 'wallSp': 5, 'speed': 6, 'color': (210, 210, 210)}
 
 # end or right
 # bar_max_R = main_SIZE[0]-bar['w']-5
@@ -44,7 +49,6 @@ bar1_score = bar2_score = 0
 bar1_ML = bar1_MR = bar2_ML = bar2_MR = 0
 
 # ball
-ball_feat = {'w': 8, 'h': 8, 'dir_s': 0, 'ang': 0, 'addAng': 0.05, 'addSpeed': 1.08, 'move': False}
 ball_x = main_SIZE[0] // 2 - ball_feat['w'] // 2
 ball_y = main_SIZE[1] // 2 - ball_feat['h'] // 2
 ball = pygame.Rect(ball_x, ball_y, ball_feat['h'], ball_feat['h'])
@@ -94,7 +98,11 @@ def set_arr(ang1, ang2):
 # @EVENTS
 # on ball git goal
 def on_goal() -> None:
+    global bar_1, bar_2
     mixer.Sound('./sounds/goal.wav').play()
+    # bar['w'] *= 2
+    bar_1 = pygame.Rect(main_SIZE[0] // 2 - bar['w'] // 2, bar['wallSp'], bar['w'], bar['h'])
+    bar_2 = pygame.Rect(main_SIZE[0] // 2 - bar['w'] // 2, main_SIZE[1] - bar['h'] - bar['wallSp'], bar['w'], bar['h'])
     ball_feat['ang'] = ball_feat['dir_s'] = 0
     ball.x = ball_x
     ball.y = ball_y
@@ -106,12 +114,23 @@ def on_collision():
     ball_feat['dir_s'] *= ball_feat['addSpeed']
     ball_feat['dir_s'] = -ball_feat['dir_s']
 
-
 # start menu controlles:
 show_game_info = True
 WINNER = ""
 isWin = False
 controles = pygame.image.load('./images/Controles_menu.png')
+
+# restart game
+def restart():
+    global isWin, show_game_info, bar1_score, bar2_score
+    isWin = False
+    # show_game_info = True
+    on_goal()
+    bar1_score = bar2_score = 0
+
+res_te = font.render("RESTART", True,random.choice([(0, 0, 255), (255, 0, 0), (0, 255, 0)]),(255,0,0))
+
+
 # create a clock object to control the frame rate
 clock = pygame.time.Clock()
 # window loop
@@ -122,9 +141,15 @@ while run:
 
         str_winner = font.render(f"The Winner is {WINNER}", True, (255, 255, 255))
         window.blit(str_winner, (WINDOW_SIZE[0]//2 - str_winner.get_width()//2,WINDOW_SIZE[1]//2 - str_winner.get_height()//2))
+        res_te = font.render("RESTART", True, random.choice([(0, 0, 255), (255, 0, 0), (0, 255, 0)]))
+        window.blit(res_te,(WINDOW_SIZE[0]//2 - res_te.get_width()//2,WINDOW_SIZE[1]//2 + res_te.get_height()))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    restart()
+
         pygame.display.flip()
         continue
 
@@ -198,13 +223,13 @@ while run:
     if ball.top <= 0:
         on_goal()
         bar2_score += 1
-        if bar2_score == 5:
+        if bar2_score == ROUNDS:
             isWin = True
             WINNER = 'Player II'
     if ball.bottom >= main_SIZE[1]:
         on_goal()
         bar1_score += 1
-        if bar1_score == 5:
+        if bar1_score == ROUNDS:
             isWin = True
             WINNER = 'Player I'
 
@@ -234,7 +259,7 @@ while run:
     window.blit(main, main_features['position'])
     # set score
     setScore()
-    set_arr(-(bar2_ML + bar2_MR) * 9,(bar1_ML + bar1_MR) * 9)
+    set_arr(-(bar2_ML + bar2_MR) * bar['multiAng'], (bar1_ML + bar1_MR) * bar['multiAng'])
     # update window
     pygame.display.flip()
     clock.tick(60)
